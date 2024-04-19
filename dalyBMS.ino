@@ -16,8 +16,12 @@ void setup(){
 
   //settign the CAN ports in loopback mode
   CAN.loopback();
+
   //setting up the filter to receive messages:
-  // CAN.filterExtended(0x18900140);
+  // CAN.filterExtended(0x18000140, 0x1F00FFFF);
+
+  //setting calback function to be called when packet is received
+  CAN.onReceive(onReceive);
 
   //populating the Tx buffer
   buffer[0] = 0x00;
@@ -28,35 +32,38 @@ void setup(){
   buffer[5] = 0x05;
   buffer[6] = 0x06;
   buffer[7] = 0x07;
+
+
+
 }
 
-void loop(){
-  //sending packet
-  CAN.beginExtendedPacket(0x18900140,8);
-  int numBytesWritten = CAN.write(buffer, 8);
-  Serial.print("Num bytes written to CAN frame: ");
-  Serial.println(numBytesWritten);
-  CAN.endPacket();
-
-  delay(1000);
-
+void onReceive(int packetSize) {
+  
   //receiving sent packet
-  int packetSize = CAN.parsePacket();
-  Serial.print("Num bytes received in packet: ");
-  Serial.println(packetSize);
-  uint32_t id = CAN.packetId();
-  Serial.print("packet ID: ");
-  Serial.println(id);
+  // Serial.print("Num bytes received in packet: ");
+  // Serial.println(packetSize);
+  // uint32_t id = CAN.packetId();
+  // Serial.print("packet ID: ");
+  // Serial.println(id);
 
   // Serial.println(CAN.available());
 
   Serial.print("data in packet: ");
-  while(CAN.available()){
+  for(int i = 0; i < 8; i++){
     int data = CAN.read();
     Serial.print(data);
     Serial.print(", ");
   }
   Serial.println();
-  delay(3000);
+}
 
+void loop(){
+  //sending packet
+  delay(100);
+  CAN.beginExtendedPacket(0x18900140,8);
+  int numBytesWritten = CAN.write(buffer, 8);
+  Serial.print("Num bytes written to CAN frame: ");
+  Serial.println(numBytesWritten);
+  CAN.endPacket();
+  
 }
