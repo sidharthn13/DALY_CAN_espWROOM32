@@ -47,8 +47,8 @@ void setup(){
   uint8_t monomerVoltage[8] = {0x0C, 0xEE, 0x04, 0x00, 0x00, 0x02, 0x03, 0xE8};
   memcpy(sampleData[1], monomerVoltage, 8);
 
-  uint8_t MosStatus[8] = {0x42, 0x01, 0x42, 0x01, 0x00, 0x02, 0x03, 0xE8};
-  memcpy(sampleData[2], MosStatus, 8);
+  uint8_t MosStatus[8] = {0x01, 0x01, 0x00, 0x0F, 0x00, 0x00, 0x75, 0x30};
+  memcpy(sampleData[3], MosStatus, 8);
 }
 
 //ISR handler that is fired when data is received
@@ -58,10 +58,10 @@ void onReceive(int packetSize) {
       memcpy(rxBuffers.SocVoltage, sampleData[0], 8);
       break;
     case 0x91:
-      memcpy(rxBuffers.monomerVoltage, sampleData[0], 8);
+      memcpy(rxBuffers.monomerVoltage, sampleData[1], 8);
       break;
-    case 0x92:
-      memcpy(rxBuffers.MosStatus, sampleData[0], 8);
+    case 0x93:
+      memcpy(rxBuffers.MosStatus, sampleData[3], 8);
       break;
   }
 }
@@ -77,18 +77,40 @@ void processBmsData(uint8_t dataID){
     case 0x90:
       break;
     case 0x91:
+      {
       int maxVoltage = rxBuffers.monomerVoltage[7] | (rxBuffers.monomerVoltage[6] << 8);
       int maxVoltageCell = rxBuffers.monomerVoltage[5];
       int minVoltage = rxBuffers.monomerVoltage[4] | (rxBuffers.monomerVoltage[3] << 8);
       int minVoltageCell = rxBuffers.monomerVoltage[2];
       Serial.print("Max voltage : ");
       Serial.print(maxVoltage);
-      Serial.print("Cell number : ");
+      Serial.print(" Cell number : ");
       Serial.print(maxVoltageCell);
       Serial.print(", Min voltage : ");
       Serial.print(minVoltage);
-      Serial.print("Cell number : ");
+      Serial.print(" Cell number : ");
       Serial.println(minVoltageCell);
+      break;
+      }
+    case 0x93:
+      {
+      int chargeDischargeStatus = rxBuffers.MosStatus[7];
+      int chargingMosTubeStatus = rxBuffers.MosStatus[6];
+      int dischargingMosTubeStatus = rxBuffers.MosStatus[5];
+      int bmsLife = rxBuffers.MosStatus[4];
+      int residualCapacity = rxBuffers.MosStatus[3] | (rxBuffers.MosStatus[2] << 8 ) | (rxBuffers.MosStatus[1] << 16 );
+      Serial.print("Charge/Discharge status : ");
+      Serial.print(chargeDischargeStatus);
+      Serial.print(", Charging MOS tube status : ");
+      Serial.print(chargingMosTubeStatus);
+      Serial.print(", Discharging MOS tube status : ");
+      Serial.print(dischargingMosTubeStatus);
+      Serial.print(", BMS life cycles : ");
+      Serial.print(bmsLife);
+      Serial.print(", Residual Capacity : ");
+      Serial.println(residualCapacity);
+      break;
+      }
   }
 }
 
@@ -97,4 +119,7 @@ void loop(){
   //sending data requests
   requestData(0x91);
   processBmsData(0x91);
+
+  requestData(0x93);
+  processBmsData(0x93);
 }
