@@ -65,20 +65,36 @@ void onReceive(int packetSize) {
       break;
   }
 }
-//pass data ID of the desired battery data
+//pass data ID of the desired battery data for requesting as well as processing
 void requestData(uint8_t dataID){
   uint32_t ID = 0x18000140 | (dataID<<16);
   CAN.beginExtendedPacket(ID, 8);
   CAN.write(buffer, 8);
   CAN.endPacket();
 }
+void processBmsData(uint8_t dataID){
+  switch(dataID){
+    case 0x90:
+      break;
+    case 0x91:
+      int maxVoltage = rxBuffers.monomerVoltage[7] | (rxBuffers.monomerVoltage[6] << 8);
+      int maxVoltageCell = rxBuffers.monomerVoltage[5];
+      int minVoltage = rxBuffers.monomerVoltage[4] | (rxBuffers.monomerVoltage[3] << 8);
+      int minVoltageCell = rxBuffers.monomerVoltage[2];
+      Serial.print("Max voltage : ");
+      Serial.print(maxVoltage);
+      Serial.print("Cell number : ");
+      Serial.print(maxVoltageCell);
+      Serial.print(", Min voltage : ");
+      Serial.print(minVoltage);
+      Serial.print("Cell number : ");
+      Serial.println(minVoltageCell);
+  }
+}
+
 void loop(){
   delay(100);
   //sending data requests
-  requestData(0x90);
-  for(int i = 0; i < 8; i++){
-    Serial.print(rxBuffers.SocVoltage[i], HEX);
-    Serial.print(", ");
-  }
-  Serial.println();
+  requestData(0x91);
+  processBmsData(0x91);
 }
