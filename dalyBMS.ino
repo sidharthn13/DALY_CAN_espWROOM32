@@ -1,11 +1,8 @@
 #include<CAN.h>
+#include "dalyBMS.h"
+#include "processBmsData.h"
 
 //initializing buffers to hold receiver data
-typedef struct RxBuffers{
-  uint8_t SocVoltage[8];
-  uint8_t monomerVoltage[8];
-  uint8_t MosStatus[8];
-}RxBuffers;
 RxBuffers rxBuffers;
 
 //initializing buffer to write to the CAN packet
@@ -51,6 +48,7 @@ void setup(){
   memcpy(sampleData[3], MosStatus, 8);
 }
 
+
 //ISR handler that is fired when data is received
 void onReceive(int packetSize) {
   switch( (CAN.packetId()>>16) & 0xFF ){
@@ -65,53 +63,12 @@ void onReceive(int packetSize) {
       break;
   }
 }
-//pass data ID of the desired battery data for requesting as well as processing
+//pass data ID of the desired battery data 
 void requestData(uint8_t dataID){
   uint32_t ID = 0x18000140 | (dataID<<16);
   CAN.beginExtendedPacket(ID, 8);
   CAN.write(buffer, 8);
   CAN.endPacket();
-}
-void processBmsData(uint8_t dataID){
-  switch(dataID){
-    case 0x90:
-      break;
-    case 0x91:
-      {
-      int maxVoltage = rxBuffers.monomerVoltage[7] | (rxBuffers.monomerVoltage[6] << 8);
-      int maxVoltageCell = rxBuffers.monomerVoltage[5];
-      int minVoltage = rxBuffers.monomerVoltage[4] | (rxBuffers.monomerVoltage[3] << 8);
-      int minVoltageCell = rxBuffers.monomerVoltage[2];
-      Serial.print("Max voltage : ");
-      Serial.print(maxVoltage);
-      Serial.print(" Cell number : ");
-      Serial.print(maxVoltageCell);
-      Serial.print(", Min voltage : ");
-      Serial.print(minVoltage);
-      Serial.print(" Cell number : ");
-      Serial.println(minVoltageCell);
-      break;
-      }
-    case 0x93:
-      {
-      int chargeDischargeStatus = rxBuffers.MosStatus[7];
-      int chargingMosTubeStatus = rxBuffers.MosStatus[6];
-      int dischargingMosTubeStatus = rxBuffers.MosStatus[5];
-      int bmsLife = rxBuffers.MosStatus[4];
-      int residualCapacity = rxBuffers.MosStatus[3] | (rxBuffers.MosStatus[2] << 8 ) | (rxBuffers.MosStatus[1] << 16 );
-      Serial.print("Charge/Discharge status : ");
-      Serial.print(chargeDischargeStatus);
-      Serial.print(", Charging MOS tube status : ");
-      Serial.print(chargingMosTubeStatus);
-      Serial.print(", Discharging MOS tube status : ");
-      Serial.print(dischargingMosTubeStatus);
-      Serial.print(", BMS life cycles : ");
-      Serial.print(bmsLife);
-      Serial.print(", Residual Capacity : ");
-      Serial.println(residualCapacity);
-      break;
-      }
-  }
 }
 
 void loop(){
