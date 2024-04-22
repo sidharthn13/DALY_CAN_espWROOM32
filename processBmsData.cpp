@@ -10,14 +10,14 @@ void processBmsData(uint8_t dataID){
         int SOC = ( (rxBuffers.singlePacketData[6] << 8) | rxBuffers.singlePacketData[7] ) / 10 ;
 
         //logging the collected info:
-        Serial.print("Pressure: ");
-        Serial.print(pressure);
-        Serial.print(" Acquisition: ");
-        Serial.print(acquisition);
-        Serial.print(" Total Current: ");
-        Serial.print(totalCurrent);
-        Serial.print(" SOC: ");
-        Serial.println(SOC);
+        // Serial.print("Pressure: ");
+        // Serial.print(pressure);
+        // Serial.print(" Acquisition: ");
+        // Serial.print(acquisition);
+        // Serial.print(" Total Current: ");
+        // Serial.print(totalCurrent);
+        // Serial.print(" SOC: ");
+        // Serial.println(SOC);
       break;
       }
     case 0x91:
@@ -38,6 +38,25 @@ void processBmsData(uint8_t dataID){
       // Serial.println(minVoltageCell);
 
       break;
+      }
+    case 0x92:
+      {
+        int maxTemperature = rxBuffers.singlePacketData[0] - 40; 
+        int maxTempMonomer = rxBuffers.singlePacketData[1];
+        int minTemperature = rxBuffers.singlePacketData[2] - 40;
+        int minTempMonomer = rxBuffers.singlePacketData[3];
+
+        //logging the collected info:
+        // Serial.print("Maximum monomer temperature: ");
+        // Serial.print(maxTemperature);
+        // Serial.print(" Max temp monomer no: ");
+        // Serial.print(maxTempMonomer); 
+        // Serial.print("Maximum monomer temperature: ");
+        // Serial.print(minTemperature);
+        // Serial.print(" Max temp monomer no: ");
+        // Serial.println(minTempMonomer); 
+        
+        break;
       }
     case 0x93:
       {

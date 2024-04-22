@@ -34,7 +34,7 @@ void setup(){
 //used for debugging
 void logBufferData(){
   for(int i = 0; i < 8; i++){
-    Serial.print(rxBuffers.singlePacketData[i]);
+    Serial.print(rxBuffers.singlePacketData[i], HEX);
     Serial.print(", ");
   }
   Serial.println();
@@ -74,14 +74,18 @@ void requestData(uint8_t dataID){
 void loop(){
   delay(100);
   
+  //////req data for SOC total voltage and current and then process it////////
+  // requestData(0x90);
+  // processBmsData(0x90);
+  ////////////////////////////////////////////////////////////////////////////
+
   ////req data for Maximum, Minimum Voltage of Monomer and then process it/////
   // requestData(0x91);
   // processBmsData(0x91);
   ////////////////////////////////////////////////////////////////////////////
 
-  //////req data for SOC total voltage and current and then process it////////
-  requestData(0x90);
-  processBmsData(0x90);
+  //req data for Maximum, Minimum temperature of Monomer and then process it//
+  // requestData(0x92);
+  // processBmsData(0x92);
   ////////////////////////////////////////////////////////////////////////////
-
 }
