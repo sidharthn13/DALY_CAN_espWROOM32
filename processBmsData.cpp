@@ -97,6 +97,36 @@ void processBmsData(uint8_t dataID){
 
         break;
       }
+      case 0x95:
+      {
+
+        break;
+      }
+      case 0x96:
+      {
+
+        break;
+      }
+      case 0x97:
+      {
+        
+        break;
+      }
+      case 0x98:
+      {
+        //each byte contains status flags for one parameter(each bit in a byte is treated as a flag where 0 ->no error and 1->error)
+        uint8_t batteryFailureStatus0 = rxBuffers.packetData[0];
+        uint8_t batteryFailureStatus1 = rxBuffers.packetData[1];
+        uint8_t batteryFailureStatus2 = rxBuffers.packetData[2];
+        uint8_t batteryFailureStatus3 = rxBuffers.packetData[3];
+        uint8_t batteryFailureStatus4 = rxBuffers.packetData[4];
+        uint8_t batteryFailureStatus5 = rxBuffers.packetData[5];
+        uint8_t batteryFailureStatus6 = rxBuffers.packetData[6];
+        uint8_t faultCode = rxBuffers.packetData[7];
+
+        break;
+      }
+
   }
 }
 

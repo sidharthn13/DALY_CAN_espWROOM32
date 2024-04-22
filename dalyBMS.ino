@@ -43,23 +43,13 @@ void logBufferData(){
 //ISR handler that is fired when data is received
 void onReceive(int packetSize) {
   //implement logic to move frame data to buffer
-  switch( (CAN.packetId()>>16) & 0xFF ){
-    case 0x90:
-    case 0x91:
-    case 0x92:
-    case 0x93:
-    case 0x94:
-      {
-        resetRxBuffers(); //sets buffer index to 0
-        for(int i = 0; i < 8; i++){
-          rxBuffers.packetData[rxBuffers.bufferIndex] = CAN.read();
-          rxBuffers.bufferIndex += 1;
-        }
-        resetRxBuffers(); 
-        // logBufferData();
-        break;
-      }
-  }
+  resetRxBuffers(); //sets buffer index to 0
+  for(int i = 0; i < 8; i++){
+  rxBuffers.packetData[rxBuffers.bufferIndex] = CAN.read();
+  rxBuffers.bufferIndex += 1;
+    }
+  resetRxBuffers(); 
+  // logBufferData();    
 }
 //pass data ID of the desired battery data 
 void requestData(uint8_t dataID){
@@ -71,7 +61,7 @@ void requestData(uint8_t dataID){
 
 void loop(){
   delay(100);
-  
+
   //////req data for SOC total voltage and current and then process it////////
   // requestData(0x90);
   // processBmsData(0x90);
@@ -96,4 +86,15 @@ void loop(){
   // requestData(0x94);
   // processBmsData(0x94);
   ///////////////////////////////////////////////////////////////////////////
+
+  //////////req data for individual voltages and then process it/////////////
+  // requestData(0x95);
+  // processBmsData(0x95);
+  ///////////////////////////////////////////////////////////////////////////
+
+  /////////req data for battery failure status and then process it///////////
+  // requestData(0x98);
+  // processBmsData(0x98);
+  ///////////////////////////////////////////////////////////////////////////
+
 }
