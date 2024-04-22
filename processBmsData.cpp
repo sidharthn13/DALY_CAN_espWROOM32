@@ -60,8 +60,26 @@ void processBmsData(uint8_t dataID){
       }
     case 0x93:
       {
-      
-      break;
+        int chargeDischargeStatus = rxBuffers.singlePacketData[0];
+        int chargingMosTubeState = rxBuffers.singlePacketData[1];
+        int dischargeMosTubeState = rxBuffers.singlePacketData[2];
+        int bmsLife = rxBuffers.singlePacketData[3];
+        int residualCapacity = (rxBuffers.singlePacketData[4] << 24) | (rxBuffers.singlePacketData[5] << 16) |
+        (rxBuffers.singlePacketData[6] << 8) | rxBuffers.singlePacketData[7];
+
+        //logging the collected info:
+        Serial.print("Charge-Discharge status: ");
+        Serial.print(chargeDischargeStatus);
+        Serial.print(" Charging MOS tube status: ");
+        Serial.print(chargingMosTubeState);
+        Serial.print(" Discharging MOS tube status");
+        Serial.print(dischargeMosTubeState);
+        Serial.print(" BMS life cycles: ");
+        Serial.print(bmsLife);
+        Serial.print(" Residual capacity: ");
+        Serial.println(residualCapacity);
+
+        break;
       }
   }
 }
