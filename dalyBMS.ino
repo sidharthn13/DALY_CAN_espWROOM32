@@ -34,7 +34,7 @@ void setup(){
 //used for debugging
 void logBufferData(){
   for(int i = 0; i < 8; i++){
-    Serial.print(rxBuffers.singlePacketData[i], HEX);
+    Serial.print(rxBuffers.packetData[i], HEX);
     Serial.print(", ");
   }
   Serial.println();
@@ -52,7 +52,7 @@ void onReceive(int packetSize) {
       {
         resetRxBuffers(); //sets buffer index to 0
         for(int i = 0; i < 8; i++){
-          rxBuffers.singlePacketData[rxBuffers.bufferIndex] = CAN.read();
+          rxBuffers.packetData[rxBuffers.bufferIndex] = CAN.read();
           rxBuffers.bufferIndex += 1;
         }
         resetRxBuffers(); 
@@ -88,7 +88,7 @@ void loop(){
   ////////////////////////////////////////////////////////////////////////////
 
   /////////req data charge/discharge MOS status and then process it//////////
-  requestData(0x93);
-  processBmsData(0x93);
+  // requestData(0x93);
+  // processBmsData(0x93);
   ///////////////////////////////////////////////////////////////////////////
 }

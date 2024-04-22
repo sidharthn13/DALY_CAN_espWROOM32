@@ -4,10 +4,10 @@ void processBmsData(uint8_t dataID){
   switch(dataID){
     case 0x90:
       {
-        float pressure = (float)( (rxBuffers.singlePacketData[0] << 8 ) | rxBuffers.singlePacketData[1] )/ 10 ;
-        float acquisition = (float)( (rxBuffers.singlePacketData[2] << 8 ) | rxBuffers.singlePacketData[3] )/ 10 ;
-        float totalCurrent = ( (float)( (rxBuffers.singlePacketData[4] << 8 ) | rxBuffers.singlePacketData[5] ) - 30000) / 10 ;
-        float SOC = (float)( (rxBuffers.singlePacketData[6] << 8) | rxBuffers.singlePacketData[7] ) / 10 ;
+        float pressure = (float)( (rxBuffers.packetData[0] << 8 ) | rxBuffers.packetData[1] )/ 10 ;
+        float acquisition = (float)( (rxBuffers.packetData[2] << 8 ) | rxBuffers.packetData[3] )/ 10 ;
+        float totalCurrent = ( (float)( (rxBuffers.packetData[4] << 8 ) | rxBuffers.packetData[5] ) - 30000) / 10 ;
+        float SOC = (float)( (rxBuffers.packetData[6] << 8) | rxBuffers.packetData[7] ) / 10 ;
 
         //logging the collected info:
         // Serial.print("Pressure: ");
@@ -22,10 +22,10 @@ void processBmsData(uint8_t dataID){
       }
     case 0x91:
       {
-      float maxVoltage = (float)((rxBuffers.singlePacketData[0] << 8 ) | rxBuffers.singlePacketData[1]);
-      float maxVoltageCell = (float)rxBuffers.singlePacketData[2];
-      float minVoltage = (float)((rxBuffers.singlePacketData[3] << 8 ) | rxBuffers.singlePacketData[4]);
-      float minVoltageCell = (float)rxBuffers.singlePacketData[5];
+      float maxVoltage = (float)((rxBuffers.packetData[0] << 8 ) | rxBuffers.packetData[1]);
+      float maxVoltageCell = (float)rxBuffers.packetData[2];
+      float minVoltage = (float)((rxBuffers.packetData[3] << 8 ) | rxBuffers.packetData[4]);
+      float minVoltageCell = (float)rxBuffers.packetData[5];
       
       // logging the collected info:
       // Serial.print("Max voltage: ");
@@ -41,10 +41,10 @@ void processBmsData(uint8_t dataID){
       }
     case 0x92:
       {
-        int maxTemperature = rxBuffers.singlePacketData[0] - 40; 
-        int maxTempMonomer = rxBuffers.singlePacketData[1];
-        int minTemperature = rxBuffers.singlePacketData[2] - 40;
-        int minTempMonomer = rxBuffers.singlePacketData[3];
+        int maxTemperature = rxBuffers.packetData[0] - 40; 
+        int maxTempMonomer = rxBuffers.packetData[1];
+        int minTemperature = rxBuffers.packetData[2] - 40;
+        int minTempMonomer = rxBuffers.packetData[3];
 
         //logging the collected info:
         // Serial.print("Maximum monomer temperature: ");
@@ -60,24 +60,24 @@ void processBmsData(uint8_t dataID){
       }
     case 0x93:
       {
-        int chargeDischargeStatus = rxBuffers.singlePacketData[0];
-        int chargingMosTubeState = rxBuffers.singlePacketData[1];
-        int dischargeMosTubeState = rxBuffers.singlePacketData[2];
-        int bmsLife = rxBuffers.singlePacketData[3];
-        int residualCapacity = (rxBuffers.singlePacketData[4] << 24) | (rxBuffers.singlePacketData[5] << 16) |
-        (rxBuffers.singlePacketData[6] << 8) | rxBuffers.singlePacketData[7];
+        int chargeDischargeStatus = rxBuffers.packetData[0];
+        int chargingMosTubeState = rxBuffers.packetData[1];
+        int dischargeMosTubeState = rxBuffers.packetData[2];
+        int bmsLife = rxBuffers.packetData[3];
+        int residualCapacity = (rxBuffers.packetData[4] << 24) | (rxBuffers.packetData[5] << 16) |
+        (rxBuffers.packetData[6] << 8) | rxBuffers.packetData[7];
 
         //logging the collected info:
-        Serial.print("Charge-Discharge status: ");
-        Serial.print(chargeDischargeStatus);
-        Serial.print(" Charging MOS tube status: ");
-        Serial.print(chargingMosTubeState);
-        Serial.print(" Discharging MOS tube status");
-        Serial.print(dischargeMosTubeState);
-        Serial.print(" BMS life cycles: ");
-        Serial.print(bmsLife);
-        Serial.print(" Residual capacity: ");
-        Serial.println(residualCapacity);
+        // Serial.print("Charge-Discharge status: ");
+        // Serial.print(chargeDischargeStatus);
+        // Serial.print(" Charging MOS tube status: ");
+        // Serial.print(chargingMosTubeState);
+        // Serial.print(" Discharging MOS tube status");
+        // Serial.print(dischargeMosTubeState);
+        // Serial.print(" BMS life cycles: ");
+        // Serial.print(bmsLife);
+        // Serial.print(" Residual capacity: ");
+        // Serial.println(residualCapacity);
 
         break;
       }
