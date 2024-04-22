@@ -4,6 +4,6 @@
 typedef struct RxBuffers{
   uint8_t singlePacketData[8];
   uint8_t multiPacketData[130];
-  uint8_t multiPacketIndex;
+  uint8_t bufferIndex;
 }RxBuffers;
 #endif

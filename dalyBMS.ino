@@ -33,19 +33,20 @@ void setup(){
 
 //ISR handler that is fired when data is received
 void onReceive(int packetSize) {
-
   //implement logic to move frame data to buffer
-
   switch( (CAN.packetId()>>16) & 0xFF ){
     case 0x90:
-      Serial.println("packet with data ID : 0x90 received");
-      break;
     case 0x91:
-      Serial.println("packet with data ID : 0x91 received");
-      break;
     case 0x93:
-      Serial.println("packet with data ID : 0x93 received");
-      break;
+      {
+        resetRxBuffers(); //sets buffer index to 0
+        
+        while(CAN.available()){
+          rxBuffers.singlePacketData[rxBuffers.bufferIndex] = (uint8_t)CAN.read();
+        }
+        resetRxBuffers();
+        break;
+      }
   }
 }
 //pass data ID of the desired battery data 
@@ -58,10 +59,11 @@ void requestData(uint8_t dataID){
 
 void loop(){
   delay(100);
-  //sending data requests
+  //req data for Maximum, Minimum Voltage of Monomer and then process it:
   requestData(0x91);
-  // processBmsData(0x91);
+  processBmsData(0x91);
+  //
 
-  requestData(0x93);
+  // requestData(0x93);
   // processBmsData(0x93);
 }
