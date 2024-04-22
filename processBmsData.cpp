@@ -1,3 +1,4 @@
+#include <sys/types.h>
 #include "esp_spi_flash.h"
 #include "processBmsData.h"
 
@@ -109,7 +110,14 @@ void processBmsData(uint8_t dataID){
       }
       case 0x97:
       {
-        
+        //each byte of data consists of equilibrium states for 8 monomers(each bit mapped to equilibrium state of one monomer)
+        uint8_t state_0_to_7 = rxBuffers.packetData[0];
+        uint8_t state_8_to_15 = rxBuffers.packetData[1];
+        uint8_t state_16_to_23 = rxBuffers.packetData[2];
+        uint8_t state_24_to_31 = rxBuffers.packetData[3];
+        uint8_t state_32_to_39 = rxBuffers.packetData[4];
+        uint8_t state_40_to_47 = rxBuffers.packetData[5];
+
         break;
       }
       case 0x98:
