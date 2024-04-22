@@ -40,11 +40,13 @@ void onReceive(int packetSize) {
     case 0x93:
       {
         resetRxBuffers(); //sets buffer index to 0
-        
-        while(CAN.available()){
-          rxBuffers.singlePacketData[rxBuffers.bufferIndex] = (uint8_t)CAN.read();
+        for(int i = 0; i < 8; i++){
+          // rxBuffers.singlePacketData[rxBuffers.bufferIndex] = (uint8_t)CAN.read();
+          Serial.print(CAN.read(), HEX);
+          Serial.print(",");
         }
-        resetRxBuffers();
+        Serial.println();
+        // resetRxBuffers();
         break;
       }
   }
@@ -59,10 +61,10 @@ void requestData(uint8_t dataID){
 
 void loop(){
   delay(100);
-  //req data for Maximum, Minimum Voltage of Monomer and then process it:
+  /////req data for Maximum, Minimum Voltage of Monomer and then process it/////
   requestData(0x91);
-  processBmsData(0x91);
-  //
+  // processBmsData(0x91);
+  /////////////////////////////////////////////////////////////////////////////
 
   // requestData(0x93);
   // processBmsData(0x93);
