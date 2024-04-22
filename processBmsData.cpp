@@ -3,7 +3,23 @@
 void processBmsData(uint8_t dataID){
   switch(dataID){
     case 0x90:
+      {
+        int pressure = ( (rxBuffers.singlePacketData[0] << 8 ) | rxBuffers.singlePacketData[1] )/ 10 ;
+        int acquisition = ( (rxBuffers.singlePacketData[2] << 8 ) | rxBuffers.singlePacketData[3] )/ 10 ;
+        int totalCurrent = ( ( (rxBuffers.singlePacketData[4] << 8 ) | rxBuffers.singlePacketData[5] ) - 30000) / 10 ;
+        int SOC = ( (rxBuffers.singlePacketData[6] << 8) | rxBuffers.singlePacketData[7] ) / 10 ;
+
+        //logging the collected info:
+        Serial.print("Pressure: ");
+        Serial.print(pressure);
+        Serial.print(" Acquisition: ");
+        Serial.print(acquisition);
+        Serial.print(" Total Current: ");
+        Serial.print(totalCurrent);
+        Serial.print(" SOC: ");
+        Serial.println(SOC);
       break;
+      }
     case 0x91:
       {
       int maxVoltage = (rxBuffers.singlePacketData[0] << 8 ) | rxBuffers.singlePacketData[1];

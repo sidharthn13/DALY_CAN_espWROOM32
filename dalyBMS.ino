@@ -31,19 +31,34 @@ void setup(){
   buffer[7] = 0x00;
 }
 
+//used for debugging
+void logBufferData(){
+  for(int i = 0; i < 8; i++){
+    Serial.print(rxBuffers.singlePacketData[i]);
+    Serial.print(", ");
+  }
+  Serial.println();
+}
+
 //ISR handler that is fired when data is received
 void onReceive(int packetSize) {
   //implement logic to move frame data to buffer
   switch( (CAN.packetId()>>16) & 0xFF ){
     case 0x90:
     case 0x91:
+    case 0x92:
     case 0x93:
+    case 0x94:
       {
         resetRxBuffers(); //sets buffer index to 0
         for(int i = 0; i < 8; i++){
           rxBuffers.singlePacketData[rxBuffers.bufferIndex] = CAN.read();
           rxBuffers.bufferIndex += 1;
         }
+        resetRxBuffers(); 
+
+        // logBufferData();
+
         break;
       }
   }
@@ -58,9 +73,15 @@ void requestData(uint8_t dataID){
 
 void loop(){
   delay(100);
+  
   ////req data for Maximum, Minimum Voltage of Monomer and then process it/////
-  requestData(0x91);
-  processBmsData(0x91);
+  // requestData(0x91);
+  // processBmsData(0x91);
+  ////////////////////////////////////////////////////////////////////////////
+
+  //////req data for SOC total voltage and current and then process it////////
+  requestData(0x90);
+  processBmsData(0x90);
   ////////////////////////////////////////////////////////////////////////////
 
 }
