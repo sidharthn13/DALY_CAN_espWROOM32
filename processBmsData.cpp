@@ -4,10 +4,10 @@ void processBmsData(uint8_t dataID){
   switch(dataID){
     case 0x90:
       {
-        int pressure = ( (rxBuffers.singlePacketData[0] << 8 ) | rxBuffers.singlePacketData[1] )/ 10 ;
-        int acquisition = ( (rxBuffers.singlePacketData[2] << 8 ) | rxBuffers.singlePacketData[3] )/ 10 ;
-        int totalCurrent = ( ( (rxBuffers.singlePacketData[4] << 8 ) | rxBuffers.singlePacketData[5] ) - 30000) / 10 ;
-        int SOC = ( (rxBuffers.singlePacketData[6] << 8) | rxBuffers.singlePacketData[7] ) / 10 ;
+        float pressure = (float)( (rxBuffers.singlePacketData[0] << 8 ) | rxBuffers.singlePacketData[1] )/ 10 ;
+        float acquisition = (float)( (rxBuffers.singlePacketData[2] << 8 ) | rxBuffers.singlePacketData[3] )/ 10 ;
+        float totalCurrent = ( (float)( (rxBuffers.singlePacketData[4] << 8 ) | rxBuffers.singlePacketData[5] ) - 30000) / 10 ;
+        float SOC = (float)( (rxBuffers.singlePacketData[6] << 8) | rxBuffers.singlePacketData[7] ) / 10 ;
 
         //logging the collected info:
         // Serial.print("Pressure: ");
@@ -22,12 +22,12 @@ void processBmsData(uint8_t dataID){
       }
     case 0x91:
       {
-      int maxVoltage = (rxBuffers.singlePacketData[0] << 8 ) | rxBuffers.singlePacketData[1];
-      int maxVoltageCell = rxBuffers.singlePacketData[2];
-      int minVoltage = (rxBuffers.singlePacketData[3] << 8 ) | rxBuffers.singlePacketData[4];
-      int minVoltageCell = rxBuffers.singlePacketData[5];
+      float maxVoltage = (float)((rxBuffers.singlePacketData[0] << 8 ) | rxBuffers.singlePacketData[1]);
+      float maxVoltageCell = (float)rxBuffers.singlePacketData[2];
+      float minVoltage = (float)((rxBuffers.singlePacketData[3] << 8 ) | rxBuffers.singlePacketData[4]);
+      float minVoltageCell = (float)rxBuffers.singlePacketData[5];
       
-      //logging the collected info:
+      // logging the collected info:
       // Serial.print("Max voltage: ");
       // Serial.print(maxVoltage);
       // Serial.print(" Max V cell no: ");

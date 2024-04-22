@@ -56,9 +56,7 @@ void onReceive(int packetSize) {
           rxBuffers.bufferIndex += 1;
         }
         resetRxBuffers(); 
-
         // logBufferData();
-
         break;
       }
   }
@@ -79,7 +77,7 @@ void loop(){
   // processBmsData(0x90);
   ////////////////////////////////////////////////////////////////////////////
 
-  ////req data for Maximum, Minimum Voltage of Monomer and then process it/////
+  ////req data for Maximum, Minimum Voltage of Monomer and then process it////
   // requestData(0x91);
   // processBmsData(0x91);
   ////////////////////////////////////////////////////////////////////////////
@@ -88,4 +86,9 @@ void loop(){
   // requestData(0x92);
   // processBmsData(0x92);
   ////////////////////////////////////////////////////////////////////////////
+
+  ///////////req data for status information 1 and then process it///////////
+  // requestData(0x93);
+  // processBmsData(0x93);
+  ///////////////////////////////////////////////////////////////////////////
 }
