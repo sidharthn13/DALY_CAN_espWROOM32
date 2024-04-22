@@ -1,3 +1,4 @@
+#include "esp_spi_flash.h"
 #include "processBmsData.h"
 
 void processBmsData(uint8_t dataID){
@@ -78,6 +79,21 @@ void processBmsData(uint8_t dataID){
         // Serial.print(bmsLife);
         // Serial.print(" Residual capacity: ");
         // Serial.println(residualCapacity);
+
+        break;
+      }
+      case 0x94:
+      {
+        uint16_t batteryString = rxBuffers.packetData[0];
+        uint16_t temperature = rxBuffers.packetData[1];
+        uint16_t chargerStatus = rxBuffers.packetData[2];
+        uint16_t loadStatus = rxBuffers.packetData[3];
+        uint16_t chargeDischargeCycles = (rxBuffers.packetData[5] << 8) | rxBuffers.packetData[6];
+        uint16_t DI_DO_states = rxBuffers.packetData[4];  //each bit in the first byte corresponds to a state
+
+        //logging the collected info:
+        // Serial.println(batteryString);
+        // Serial.println((uint8_t)DI_DO_states);
 
         break;
       }
