@@ -105,9 +105,7 @@ void requestData(uint8_t dataID){
 
 void loop(){
   delay(100);
-
-  Serial.println("----------------------- BMS stats ----------------------------");
-
+  
   //////req data for SOC total voltage and current and then process it////////
   requestData(0x90);
   delay(50); //To wait for relevant data packet to be written to the buffer.(prevents reading old data)
