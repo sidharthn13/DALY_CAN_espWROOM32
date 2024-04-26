@@ -84,6 +84,7 @@ void onReceive(int packetSize) {
         rxBuffers.packetData[rxBuffers.bufferIndex] = CAN.read();
         rxBuffers.bufferIndex += 1;
         }
+      resetRxBuffers();
       processFrame(bmsStats.cellVoltagesIndex);
       }
   }
