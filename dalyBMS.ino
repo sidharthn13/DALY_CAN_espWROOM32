@@ -1,4 +1,3 @@
-#include<CAN.h>
 #include "dalyBMS.h"
 #include "processBmsData.h"
 
@@ -66,11 +65,7 @@ void onReceive(int packetSize) {
     case 0x97:
     case 0x98:
       {
-      resetRxBuffers(); //sets buffer index to 0
-      for(int i = 0; i < 8; i++){
-      rxBuffers.packetData[rxBuffers.bufferIndex] = CAN.read();
-      rxBuffers.bufferIndex += 1;
-        }
+      processBmsData( (CAN.packetId()>>16) & 0xFF );
       break;
       }
     case 0x95:
@@ -108,58 +103,59 @@ void loop(){
   
   //////req data for SOC total voltage and current and then process it////////
   requestData(0x90);
-  delay(50); //To wait for relevant data packet to be written to the buffer.(prevents reading old data)
-  processBmsData(0x90);
+  // delay(50); //To wait for relevant data packet to be written to the buffer.(prevents reading old data)
+  // processBmsData(0x90);
   ////////////////////////////////////////////////////////////////////////////
 
   ////req data for Maximum, Minimum Voltage of Monomer and then process it////
   requestData(0x91);
-  delay(50);
-  processBmsData(0x91);
+  // delay(50);
+  // processBmsData(0x91);
   ////////////////////////////////////////////////////////////////////////////
 
   //req data for Maximum, Minimum temperature of Monomer and then process it//
   requestData(0x92);
-  delay(50);
-  processBmsData(0x92);
+  // delay(50);
+  // processBmsData(0x92);
   ////////////////////////////////////////////////////////////////////////////
 
   /////////req data charge/discharge MOS status and then process it//////////
-  requestData(0x93);
-  delay(50);
-  processBmsData(0x93);
+  // requestData(0x93);
+  // delay(50);
+  // processBmsData(0x93);
   ///////////////////////////////////////////////////////////////////////////
 
   //////////req data for status information 1 and then process it////////////
-  requestData(0x94);
-  delay(50);
-  processBmsData(0x94);
+  // requestData(0x94);
+  // delay(50);
+  // processBmsData(0x94);
   ///////////////////////////////////////////////////////////////////////////
 
   ////////req data for individual cell voltages and then process it//////////
-  bmsStats.cellVoltagesIndex = 0;
-  requestData(0x95);
-  delay(50); //to give enough time for all packets to be received before processing the data
-  processBmsData(0x95);
+  // bmsStats.cellVoltagesIndex = 0;
+  // requestData(0x95);
+  // delay(50); //to give enough time for all packets to be received before processing the data
+  // processBmsData(0x95);
   ///////////////////////////////////////////////////////////////////////////
 
   /////req data for individual monomer temperature and then process it///////
-  bmsStats.monomerTempsIndex = 0;
-  requestData(0x96);
-  delay(50);
-  processBmsData(0x96);
+  // bmsStats.monomerTempsIndex = 0;
+  // requestData(0x96);
+  // delay(50);
+  // processBmsData(0x96);
   ///////////////////////////////////////////////////////////////////////////
 
   ///////req data for monomer equilibrium states and then process it/////////
-  requestData(0x97);
-  delay(50);
-  processBmsData(0x97);
+  // requestData(0x97);
+  // delay(50);
+  // processBmsData(0x97);
   ///////////////////////////////////////////////////////////////////////////
 
   /////////req data for battery failure status and then process it///////////
-  requestData(0x98);
-  delay(50);
-  processBmsData(0x98);
+  // requestData(0x98);
+  // delay(50);
+  // processBmsData(0x98);
   ///////////////////////////////////////////////////////////////////////////
 
+  printProcessedData();
 }
