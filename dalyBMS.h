@@ -11,5 +11,8 @@ typedef struct bmsData{
 
   uint16_t cellVoltages[48];
   uint8_t cellVoltagesIndex;
+
+  float monomerTemps[16];
+  uint8_t monomerTempsIndex;
 }bmsData;
 #endif

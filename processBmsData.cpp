@@ -112,7 +112,12 @@ void processBmsData(uint8_t dataID){
       }
       case 0x96:
       {
-
+        Serial.print("Monomer Temperatures: ");
+        for(int i = 0; i < 16; i++){
+          Serial.print(bmsStats.monomerTemps[i]);
+          Serial.print(", ");
+        }
+        Serial.println();
         break;
       }
       case 0x97:

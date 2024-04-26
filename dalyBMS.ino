@@ -2,8 +2,6 @@
 #include "dalyBMS.h"
 #include "processBmsData.h"
 
-int flag;
-
 //initializing buffers to hold receiver data
 RxBuffers rxBuffers;
 
@@ -14,7 +12,6 @@ bmsData bmsStats;
 uint8_t buffer[8];
 
 void setup(){
-  flag = 0;
 
   Serial.begin(115200);
   if(!CAN.begin(250E3)){
@@ -38,16 +35,7 @@ void setup(){
   buffer[7] = 0x00;
 }
 
-//used for debugging
-void logBufferData(){
-  for(int i = 0; i < 8; i++){
-    Serial.print(rxBuffers.packetData[i], HEX);
-    Serial.print(", ");
-  }
-  Serial.println();
-}
-
-void processFrame( uint8_t cellNum ){
+void processCellVoltFrame( uint8_t cellNum ){
   uint16_t cA = ( rxBuffers.packetData[1] << 8 ) | rxBuffers.packetData[2];
   bmsStats.cellVoltages[cellNum] = cA;
   bmsStats.cellVoltagesIndex += 1;
@@ -57,6 +45,13 @@ void processFrame( uint8_t cellNum ){
   uint16_t cC = ( rxBuffers.packetData[5] << 8 ) | rxBuffers.packetData[6];
   bmsStats.cellVoltages[cellNum+2] = cC;
   bmsStats.cellVoltagesIndex += 1;
+}
+
+void processMonomerTempsFrame( uint8_t monomerNum ){
+  for(int i = 0 ; i < 7; i++){
+    bmsStats.monomerTemps[monomerNum + i] = (float)rxBuffers.packetData[i+1] - 40;
+    bmsStats.monomerTempsIndex += 1;
+  }
 }
 
 //ISR handler that is fired when data is received
@@ -85,9 +80,18 @@ void onReceive(int packetSize) {
         rxBuffers.packetData[rxBuffers.bufferIndex] = CAN.read();
         rxBuffers.bufferIndex += 1;
         }
-      resetRxBuffers();
-      processFrame(bmsStats.cellVoltagesIndex);
+      processCellVoltFrame(bmsStats.cellVoltagesIndex);
       break;
+      }
+    case 0x96:
+      {
+        resetRxBuffers();
+        for(int i = 0; i < 8; i++){
+        rxBuffers.packetData[rxBuffers.bufferIndex] = CAN.read();
+        rxBuffers.bufferIndex += 1;
+        }
+        processMonomerTempsFrame( bmsStats.monomerTempsIndex );
+        break;
       }
   }
 }
@@ -106,7 +110,7 @@ void loop(){
 
   //////req data for SOC total voltage and current and then process it////////
   requestData(0x90);
-  delay(50); //To wait for relevant data packet to be recived.(prevents reading old data)
+  delay(50); //To wait for relevant data packet to be written to the buffer.(prevents reading old data)
   processBmsData(0x90);
   ////////////////////////////////////////////////////////////////////////////
 
@@ -116,13 +120,11 @@ void loop(){
   processBmsData(0x91);
   ////////////////////////////////////////////////////////////////////////////
 
-
   //req data for Maximum, Minimum temperature of Monomer and then process it//
   requestData(0x92);
   delay(50);
   processBmsData(0x92);
   ////////////////////////////////////////////////////////////////////////////
-
 
   /////////req data charge/discharge MOS status and then process it//////////
   requestData(0x93);
@@ -130,26 +132,24 @@ void loop(){
   processBmsData(0x93);
   ///////////////////////////////////////////////////////////////////////////
 
-
   //////////req data for status information 1 and then process it////////////
   requestData(0x94);
   delay(50);
   processBmsData(0x94);
   ///////////////////////////////////////////////////////////////////////////
 
-
   ////////req data for individual cell voltages and then process it//////////
   bmsStats.cellVoltagesIndex = 0;
   requestData(0x95);
   delay(50); //to give enough time for all packets to be received before processing the data
   processBmsData(0x95);
-  bmsStats.cellVoltagesIndex = 0;
   ///////////////////////////////////////////////////////////////////////////
 
-
   /////req data for individual monomer temperature and then process it///////
-  // requestData(0x96);
-  // processBmsData(0x96);
+  bmsStats.monomerTempsIndex = 0;
+  requestData(0x96);
+  delay(50);
+  processBmsData(0x96);
   ///////////////////////////////////////////////////////////////////////////
 
   ///////req data for monomer equilibrium states and then process it/////////
@@ -157,7 +157,6 @@ void loop(){
   delay(50);
   processBmsData(0x97);
   ///////////////////////////////////////////////////////////////////////////
-
 
   /////////req data for battery failure status and then process it///////////
   requestData(0x98);
