@@ -92,6 +92,8 @@ void processBmsData(uint8_t dataID){
         uint16_t chargeDischargeCycles = (rxBuffers.packetData[5] << 8) | rxBuffers.packetData[6];
         uint16_t DI_DO_states = rxBuffers.packetData[4];  //each bit in the first byte corresponds to a state
 
+        bmsStats.batteryString = (uint8_t)batteryString;
+
         //logging the collected info:
         // Serial.println(batteryString);
         // Serial.println((uint8_t)DI_DO_states);
@@ -100,7 +102,12 @@ void processBmsData(uint8_t dataID){
       }
       case 0x95:
       {
-
+        Serial.print("Cell voltages: ");
+        for(int i = 0; i < 16; i++){
+          Serial.print(bmsStats.cellVoltages[i]);
+          Serial.print(", ");
+        }
+        Serial.println();
         break;
       }
       case 0x96:
