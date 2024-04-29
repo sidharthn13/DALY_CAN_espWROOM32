@@ -110,7 +110,7 @@ void requestData(uint8_t dataID){
 
 void loop(){
   
-  if ( millis() - requestTimer > 80 ){ processFlag = 1; }
+  if ( millis() - requestTimer > 200 ){ processFlag = 1; }
 
   switch(state){
     case s0:
@@ -120,7 +120,7 @@ void loop(){
         requestData(0x90); 
         state = s0_idle;
         }
-      if(processFlag == 1){
+      if(processFlag == 1 && state == s0_idle){
         processBmsData(0x90);
         processFlag = 0;
         state = s1;
@@ -136,7 +136,7 @@ void loop(){
       requestData(0x91);
       state = s1_idle;
       }
-      if(processFlag == 1){
+      if(processFlag == 1 && state == s1_idle){
         processBmsData(0x91);
         processFlag = 0;
         state = s2;
@@ -152,7 +152,7 @@ void loop(){
         requestData(0x92);
         state = s2_idle;
       }
-      if(processFlag == 1){
+      if(processFlag == 1 && state == s2_idle){
         processBmsData(0x92);
         processFlag = 0;
         state = s3;
@@ -168,7 +168,7 @@ void loop(){
         requestData(0x93);
         state = s3_idle;
       }
-      if(processFlag == 1){
+      if(processFlag == 1 && state == s3_idle){
         processBmsData(0x93);
         processFlag = 0;
         state = s4;
@@ -184,7 +184,7 @@ void loop(){
         requestData(0x94);
         state = s4_idle;
       }
-      if(processFlag == 1){
+      if(processFlag == 1 && state == s4_idle){
         processBmsData(0x94);
         processFlag = 0;
         state = s5;
@@ -202,7 +202,7 @@ void loop(){
         requestData(0x95);
         state = s5_idle;
       }
-      if( processFlag == 1 ){
+      if( processFlag == 1 && state == s5_idle){
         processFlag = 0;
         processBmsData(0x95);
         state = s6;
@@ -220,10 +220,10 @@ void loop(){
         requestData(0x96);
         state = s6_idle;
       }
-      if( processFlag == 1 ){
+      if( processFlag == 1 && state == s6_idle){
         processFlag = 0;
         processBmsData(0x96);
-        state = s9;
+        state = s7;
         requestTimer = millis();
       }
       break;
@@ -236,7 +236,7 @@ void loop(){
         requestData(0x97);
         state = s7_idle;
       }
-      if(processFlag == 1){
+      if(processFlag == 1 && state == s7_idle){
         processBmsData(0x97);
         processFlag = 0;
         state = s8;
@@ -252,7 +252,7 @@ void loop(){
         requestData(0x98);
         state = s8_idle;
       }
-      if(processFlag == 1){
+      if(processFlag == 1 && state == s8_idle){
         processBmsData(0x98);
         processFlag = 0;
         state = s9;

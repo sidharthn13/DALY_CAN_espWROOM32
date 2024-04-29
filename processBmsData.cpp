@@ -6,77 +6,50 @@ void processBmsData(uint8_t dataID){
   switch(dataID){
     case 0x90:
       {
-        float pressure = (float)( (rxBuffers.packetData[0] << 8 ) | rxBuffers.packetData[1] )/ 10 ;
-        float acquisition = (float)( (rxBuffers.packetData[2] << 8 ) | rxBuffers.packetData[3] )/ 10 ;
-        float totalCurrent = ( (float)( (rxBuffers.packetData[4] << 8 ) | rxBuffers.packetData[5] ) - 30000) / 10 ;
-        float SOC = (float)( (rxBuffers.packetData[6] << 8) | rxBuffers.packetData[7] ) / 10 ;
+        bmsStats.pressureVoltage = (float)( (rxBuffers.packetData[0] << 8 ) | rxBuffers.packetData[1] )/ 10 ;
+        bmsStats.acquisitionVoltage = (float)( (rxBuffers.packetData[2] << 8 ) | rxBuffers.packetData[3] )/ 10 ;
+        bmsStats.totalCurrent = ( (float)( (rxBuffers.packetData[4] << 8 ) | rxBuffers.packetData[5] ) - 30000) / 10 ;
+        bmsStats.SOC = (float)( (rxBuffers.packetData[6] << 8) | rxBuffers.packetData[7] ) / 10 ;
 
-        //writing data to structure holding BMS stats:
-        bmsStats.pressureVoltage = pressure;
-        bmsStats.acquisitionVoltage = acquisition;
-        bmsStats.totalCurrent = totalCurrent;
-        bmsStats.SOC = SOC;
-
-      break;
+        break;
       }
     case 0x91:
       {
-      float maxVoltage = (float)((rxBuffers.packetData[0] << 8 ) | rxBuffers.packetData[1]);
-      float maxVoltageCell = (float)rxBuffers.packetData[2];
-      float minVoltage = (float)((rxBuffers.packetData[3] << 8 ) | rxBuffers.packetData[4]);
-      float minVoltageCell = (float)rxBuffers.packetData[5];
+      bmsStats.maxCellVoltage  = (float)((rxBuffers.packetData[0] << 8 ) | rxBuffers.packetData[1]);
+      bmsStats.maxCellVoltNum = rxBuffers.packetData[2];
+      bmsStats.minCellVoltage = (float)((rxBuffers.packetData[3] << 8 ) | rxBuffers.packetData[4]);
+      bmsStats.minCellVoltNum = rxBuffers.packetData[5];
       
-       //writing data to structure holding BMS stats:
-      bmsStats.maxCellVoltage = maxVoltage;
-      bmsStats.maxCellVoltNum = maxVoltageCell;
-      bmsStats.minCellVoltage = minVoltage;
-      bmsStats.minCellVoltNum = minVoltageCell;
-
       break;
       }
     case 0x92:
       {
-        int maxTemperature = rxBuffers.packetData[0] - 40; 
-        int maxTempMonomer = rxBuffers.packetData[1];
-        int minTemperature = rxBuffers.packetData[2] - 40;
-        int minTempMonomer = rxBuffers.packetData[3];
-
-        //writing data to structure holding BMS stats:
-        bmsStats.maxMonomerTemp = maxTemperature;
-        bmsStats.minMonomerTemp = minTemperature;
-        bmsStats.maxMonomerTempNum = maxTempMonomer;
-        bmsStats.minMonomerTempNum = minTempMonomer;
+        bmsStats.maxMonomerTemp = (float)(rxBuffers.packetData[0] - 40); 
+        bmsStats.minMonomerTemp = (float)(rxBuffers.packetData[2] - 40);
+        bmsStats.maxMonomerTempNum = rxBuffers.packetData[1];
+        bmsStats.minMonomerTempNum = rxBuffers.packetData[3];
 
         break;
       }
     case 0x93:
       {
-        int chargeDischargeStatus = rxBuffers.packetData[0];
-        int chargingMosTubeState = rxBuffers.packetData[1];
-        int dischargeMosTubeState = rxBuffers.packetData[2];
-        int bmsLife = rxBuffers.packetData[3];
-        int residualCapacity = (rxBuffers.packetData[4] << 24) | (rxBuffers.packetData[5] << 16) |
+        bmsStats.chargeDischargeStatus = rxBuffers.packetData[0];
+        bmsStats.chargingMosTubeState = rxBuffers.packetData[1];
+        bmsStats.dischargeMosTubeState = rxBuffers.packetData[2];
+        bmsStats.bmsLife = rxBuffers.packetData[3];
+        bmsStats.residualCapacity = (rxBuffers.packetData[4] << 24) | (rxBuffers.packetData[5] << 16) |
         (rxBuffers.packetData[6] << 8) | rxBuffers.packetData[7];
-
-        //writing data to structure holding BMS stats:
-        bmsStats.chargeDischargeStatus = chargeDischargeStatus;
-        bmsStats.chargingMosTubeState = chargingMosTubeState;
-        bmsStats.dischargeMosTubeState = dischargeMosTubeState;
-        bmsStats.bmsLife = bmsLife;
-        bmsStats.residualCapacity = residualCapacity;
 
         break;
       }
       case 0x94:
       {
-        uint16_t batteryString = rxBuffers.packetData[0];
+        bmsStats.batteryString = rxBuffers.packetData[0];
         uint16_t temperature = rxBuffers.packetData[1];
         uint16_t chargerStatus = rxBuffers.packetData[2];
         uint16_t loadStatus = rxBuffers.packetData[3];
         uint16_t chargeDischargeCycles = (rxBuffers.packetData[5] << 8) | rxBuffers.packetData[6];
         uint16_t DI_DO_states = rxBuffers.packetData[4];  //each bit in the first byte corresponds to a state
-
-        bmsStats.batteryString = (uint8_t)batteryString;
 
         break;
       }
