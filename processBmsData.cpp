@@ -180,22 +180,22 @@ void printProcessedData(){
   Serial.print(bmsStats.batteryString);
 
   //printing 0x95 data:
-  Serial.print(", Cell voltages: ");
-  Serial.print("[ ");
-  for(int i = 0; i < 16; i++){
-    Serial.print(bmsStats.cellVoltages[i]);
-    Serial.print("mV, ");
-    }
-  Serial.print("]");
+  // Serial.print(", Cell voltages: ");
+  // Serial.print("[ ");
+  // for(int i = 0; i < 16; i++){
+  //   Serial.print(bmsStats.cellVoltages[i]);
+  //   Serial.print("mV, ");
+  //   }
+  // Serial.print("]");
 
   //printing 0x96 data:
-  Serial.print(", Monomer Temperatures: ");
-  Serial.print("[ ");
-  for(int i = 0; i < 16; i++){
-    Serial.print(bmsStats.monomerTemps[i]);
-    Serial.print(" deg C, ");
-    }
-  Serial.print("]");
+  // Serial.print(", Monomer Temperatures: ");
+  // Serial.print("[ ");
+  // for(int i = 0; i < 16; i++){
+  //   Serial.print(bmsStats.monomerTemps[i]);
+  //   Serial.print(" deg C, ");
+  //   }
+  // Serial.print("]");
 
   //end 
   Serial.println();

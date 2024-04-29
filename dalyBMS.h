@@ -1,6 +1,29 @@
 #include<Arduino.h>
 #ifndef STRUCT_DEFINITION
 #define STRUCT_DEFINITION
+
+typedef enum{
+  s0,
+  s0_idle,
+  s1,
+  s1_idle,
+  s2,
+  s2_idle,
+  s3,
+  s3_idle,
+  s4,
+  s4_idle,
+  s5,
+  s5_idle,
+  s6,
+  s6_idle,
+  s7,
+  s7_idle,
+  s8,
+  s8_idle,
+  s9,
+}STATE;
+
 typedef struct RxBuffers{
   uint8_t packetData[8];
   uint8_t bufferIndex;

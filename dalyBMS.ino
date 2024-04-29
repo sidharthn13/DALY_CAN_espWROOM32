@@ -2,7 +2,13 @@
 #include "dalyBMS.h"
 #include "processBmsData.h"
 
-#define REQUEST_TIMER 1000
+//initializing requestTimer
+long unsigned int requestTimer;
+
+//initializing FSM 
+STATE state;
+uint8_t processFlag;
+
 
 //initializing buffers to hold receiver data
 RxBuffers rxBuffers;
@@ -14,6 +20,13 @@ bmsData bmsStats;
 uint8_t buffer[8];
 
 void setup(){
+
+  //intializing state and fsm:
+  state = s0;
+  processFlag = 0; //processing of data frame should not happen now
+
+  //intializing request timer:
+  requestTimer = 0;
 
   Serial.begin(115200);
   if(!CAN.begin(250E3)){
@@ -106,64 +119,156 @@ void requestData(uint8_t dataID){
 }
 
 void loop(){
-  delay(100);
+  
+  if ( millis() - requestTimer > 50 ){ processFlag = 1; }
+
+  switch(state){
+    case s0:
+    case s0_idle:
+    {
+      if(state == s0){ 
+        requestData(0x90); 
+        state = s0_idle;
+        }
+      if(processFlag == 1){
+        processBmsData(0x90);
+        processFlag = 0;
+        state = s1;
+        requestTimer = millis();
+      }
+      break;
+    }
+
+    case s1:
+    case s1_idle:
+    {
+      if(state == s1){
+      requestData(0x91);
+      state = s1_idle;
+      }
+      if(processFlag == 1){
+        processBmsData(0x91);
+        processFlag = 0;
+        state = s2;
+        requestTimer = millis();
+      }
+      break;
+    }
+
+    case s2:
+    case s2_idle:
+    {
+      if(state == s2){
+        requestData(0x92);
+        state = s2_idle;
+      }
+      if(processFlag == 1){
+        processBmsData(0x92);
+        processFlag = 0;
+        state = s3;
+        requestTimer = millis();
+      }
+      break;
+    }
+
+    case s3:
+    case s3_idle:
+    {
+      if(state == s3){
+        requestData(0x93);
+        state = s3_idle;
+      }
+      if(processFlag == 1){
+        processBmsData(0x93);
+        processFlag = 0;
+        state = s4;
+        requestTimer = millis();
+      }
+      break;
+    }
+
+    case s4:
+    case s4_idle:
+    {
+      if(state == s4){
+        requestData(0x94);
+        state = s4_idle;
+      }
+      if(processFlag == 1){
+        processBmsData(0x94);
+        processFlag = 0;
+        state = s9;
+        requestTimer = millis();
+      }
+      break;
+    }
+
+    case s9:
+    {
+      printProcessedData();
+      state = s0;
+      requestTimer = millis();
+      break;
+    }
+  }
+
   
   //////req data for SOC total voltage and current and then process it////////
-  requestData(0x90);
-  delay(50); //To wait for relevant data packet to be written to the buffer.(prevents reading old data)
-  processBmsData(0x90);
+  // requestData(0x90);
+  // delay(50); //To wait for relevant data packet to be written to the buffer.(prevents reading old data)
+  // processBmsData(0x90);
   ////////////////////////////////////////////////////////////////////////////
 
   ////req data for Maximum, Minimum Voltage of Monomer and then process it////
-  requestData(0x91);
-  delay(50);
-  processBmsData(0x91);
+  // requestData(0x91);
+  // delay(50);
+  // processBmsData(0x91);
   ////////////////////////////////////////////////////////////////////////////
 
   //req data for Maximum, Minimum temperature of Monomer and then process it//
-  requestData(0x92);
-  delay(50);
-  processBmsData(0x92);
+  // requestData(0x92);
+  // delay(50);
+  // processBmsData(0x92);
   ////////////////////////////////////////////////////////////////////////////
 
   /////////req data charge/discharge MOS status and then process it//////////
-  requestData(0x93);
-  delay(50);
-  processBmsData(0x93);
+  // requestData(0x93);
+  // delay(50);
+  // processBmsData(0x93);
   ///////////////////////////////////////////////////////////////////////////
 
   //////////req data for status information 1 and then process it////////////
-  requestData(0x94);
-  delay(50);
-  processBmsData(0x94);
+  // requestData(0x94);
+  // delay(50);
+  // processBmsData(0x94);
   ///////////////////////////////////////////////////////////////////////////
 
   ////////req data for individual cell voltages and then process it//////////
-  bmsStats.cellVoltagesIndex = 0;
-  requestData(0x95);
-  delay(50); //to give enough time for all packets to be received before processing the data
-  processBmsData(0x95);
+  // bmsStats.cellVoltagesIndex = 0;
+  // requestData(0x95);
+  // delay(50); //to give enough time for all packets to be received before processing the data
+  // processBmsData(0x95);
   ///////////////////////////////////////////////////////////////////////////
 
   /////req data for individual monomer temperature and then process it///////
-  bmsStats.monomerTempsIndex = 0;
-  requestData(0x96);
-  delay(50);
-  processBmsData(0x96);
+  // bmsStats.monomerTempsIndex = 0;
+  // requestData(0x96);
+  // delay(50);
+  // processBmsData(0x96);
   ///////////////////////////////////////////////////////////////////////////
 
   ///////req data for monomer equilibrium states and then process it/////////
-  requestData(0x97);
-  delay(50);
-  processBmsData(0x97);
+  // requestData(0x97);
+  // delay(50);
+  // processBmsData(0x97);
   ///////////////////////////////////////////////////////////////////////////
 
   /////////req data for battery failure status and then process it///////////
-  requestData(0x98);
-  delay(50);
-  processBmsData(0x98);
+  // requestData(0x98);
+  // delay(50);
+  // processBmsData(0x98);
   ///////////////////////////////////////////////////////////////////////////
 
-  printProcessedData();
+  // printProcessedData();
 
 }
