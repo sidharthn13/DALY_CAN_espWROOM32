@@ -88,16 +88,18 @@ void onReceive(int packetSize) {
       }
     case 0x96:
       {
-        resetRxBuffers();
         for(int i = 0; i < 8; i++){
-        rxBuffers.packetData[rxBuffers.bufferIndex] = CAN.read();
-        rxBuffers.bufferIndex += 1;
+          uint8_t data = CAN.read();
+          if(i!=0){
+            rxBuffers.multiPacketData[rxBuffers.multiPacketBufferIndex] = data;
+            rxBuffers.multiPacketBufferIndex += 1;
+          }
         }
-        processMonomerTempsFrame( bmsStats.monomerTempsIndex );
         break;
       }
   }
 }
+
 //pass data ID of the desired battery data 
 void requestData(uint8_t dataID){
   uint32_t ID = 0x18000140 | (dataID<<16);
@@ -108,7 +110,7 @@ void requestData(uint8_t dataID){
 
 void loop(){
   
-  if ( millis() - requestTimer > 50 ){ processFlag = 1; }
+  if ( millis() - requestTimer > 20 ){ processFlag = 1; }
 
   switch(state){
     case s0:
@@ -202,6 +204,23 @@ void loop(){
       }
       if( millis() - requestTimer > 100 ){
         processBmsData(0x95);
+        state = s6;
+        requestTimer = millis();
+      }
+      break;
+    }
+
+    case s6:
+    case s6_idle:
+    {
+      if(state == s6){
+        resetMultiPacketBuffer();
+        bmsStats.monomerTempsIndex = 0;
+        requestData(0x96);
+        state = s6_idle;
+      }
+      if( millis() - requestTimer > 100 ){
+        processBmsData(0x96);
         state = s9;
         requestTimer = millis();
       }

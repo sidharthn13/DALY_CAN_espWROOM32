@@ -90,6 +90,10 @@ void processBmsData(uint8_t dataID){
       }
       case 0x96:
       {
+        for(int i = 0; i < 21; i++){
+          bmsStats.monomerTemps[bmsStats.monomerTempsIndex] = rxBuffers.multiPacketData[i] - 40;
+          bmsStats.monomerTempsIndex += 1;
+        }
         break;
       }
       case 0x97:
@@ -196,14 +200,14 @@ void printProcessedData(){
     }
   Serial.print("]");
 
-  //printing 0x96 data:
-  // Serial.print(", Monomer Temperatures: ");
-  // Serial.print("[ ");
-  // for(int i = 0; i < 16; i++){
-  //   Serial.print(bmsStats.monomerTemps[i]);
-  //   Serial.print(" deg C, ");
-  //   }
-  // Serial.print("]");
+  // printing 0x96 data:
+  Serial.print(", Monomer Temperatures: ");
+  Serial.print("[ ");
+  for(int i = 0; i < 16; i++){
+    Serial.print(bmsStats.monomerTemps[i]);
+    Serial.print(" deg C, ");
+    }
+  Serial.print("]");
 
   //end 
   Serial.println();
