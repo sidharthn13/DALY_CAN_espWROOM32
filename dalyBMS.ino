@@ -2,6 +2,8 @@
 #include "dalyBMS.h"
 #include "processBmsData.h"
 
+#define REQUEST_TIMER 1000
+
 //initializing buffers to hold receiver data
 RxBuffers rxBuffers;
 
@@ -161,5 +163,7 @@ void loop(){
   delay(50);
   processBmsData(0x98);
   ///////////////////////////////////////////////////////////////////////////
+
+  printProcessedData();
 
 }
