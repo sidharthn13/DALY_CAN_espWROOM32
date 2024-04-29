@@ -110,7 +110,7 @@ void requestData(uint8_t dataID){
 
 void loop(){
   
-  if ( millis() - requestTimer > 20 ){ processFlag = 1; }
+  if ( millis() - requestTimer > 80 ){ processFlag = 1; }
 
   switch(state){
     case s0:
@@ -202,7 +202,8 @@ void loop(){
         requestData(0x95);
         state = s5_idle;
       }
-      if( millis() - requestTimer > 100 ){
+      if( processFlag == 1 ){
+        processFlag = 0;
         processBmsData(0x95);
         state = s6;
         requestTimer = millis();
@@ -219,7 +220,8 @@ void loop(){
         requestData(0x96);
         state = s6_idle;
       }
-      if( millis() - requestTimer > 100 ){
+      if( processFlag == 1 ){
+        processFlag = 0;
         processBmsData(0x96);
         state = s9;
         requestTimer = millis();
