@@ -20,19 +20,6 @@ void processBmsData(uint8_t dataID){
         bmsStats.totalCurrent = totalCurrent;
         bmsStats.SOC = SOC;
 
-        //logging the collected info:
-        // Serial.print("Pressure: ");
-        // Serial.print(pressure);
-        // Serial.print("V");
-        // Serial.print(", Acquisition: ");
-        // Serial.print(acquisition);
-        // Serial.print("V");
-        // Serial.print(", Total Current: ");
-        // Serial.print(totalCurrent);
-        // Serial.print("A");
-        // Serial.print(", SOC: ");
-        // Serial.print(SOC);
-        // Serial.print("%");
       break;
       }
     case 0x91:
@@ -48,18 +35,6 @@ void processBmsData(uint8_t dataID){
       bmsStats.minCellVoltage = minVoltage;
       bmsStats.minCellVoltNum = minVoltageCell;
 
-      // logging the collected info:
-      // Serial.print(", Max voltage: ");
-      // Serial.print(maxVoltage);
-      // Serial.print("mV");
-      // Serial.print(", Max V cell no: ");
-      // Serial.print(maxVoltageCell);
-      // Serial.print(", Min voltage: ");
-      // Serial.print(minVoltage);
-      // Serial.print("mV");
-      // Serial.print(", Min V cell no: ");
-      // Serial.print(minVoltageCell);
-
       break;
       }
     case 0x92:
@@ -74,18 +49,6 @@ void processBmsData(uint8_t dataID){
         bmsStats.minMonomerTemp = minTemperature;
         bmsStats.maxMonomerTempNum = maxTempMonomer;
         bmsStats.minMonomerTempNum = minTempMonomer;
-
-        //logging the collected info:
-        // Serial.print(", Maximum monomer temperature: ");
-        // Serial.print(maxTemperature);
-        // Serial.print(" deg C");
-        // Serial.print(", Max temp monomer no: ");
-        // Serial.print(maxTempMonomer); 
-        // Serial.print(", Minimumum monomer temperature: ");
-        // Serial.print(minTemperature);
-        // Serial.print(" deg C");
-        // Serial.print(", Min temp monomer no: ");
-        // Serial.print(minTempMonomer); 
         
         break;
       }
@@ -105,19 +68,6 @@ void processBmsData(uint8_t dataID){
         bmsStats.bmsLife = bmsLife;
         bmsStats.residualCapacity = residualCapacity;
 
-        //logging the collected info:
-        // Serial.print(", Charge-Discharge status: ");
-        // Serial.print(chargeDischargeStatus);
-        // Serial.print(", Charging MOS tube status: ");
-        // Serial.print(chargingMosTubeState);
-        // Serial.print(", Discharging MOS tube status");
-        // Serial.print(dischargeMosTubeState);
-        // Serial.print(", BMS life cycles: ");
-        // Serial.print(bmsLife);
-        // Serial.print(", Residual capacity: ");
-        // Serial.print(residualCapacity);
-        // Serial.print("mAH");
-
         break;
       }
       case 0x94:
@@ -131,33 +81,15 @@ void processBmsData(uint8_t dataID){
 
         bmsStats.batteryString = (uint8_t)batteryString;
 
-        // logging the collected info:
-        // Serial.print(", Battery String: ");
-        // Serial.print(batteryString);
-        // Serial.println((uint8_t)DI_DO_states);
 
         break;
       }
       case 0x95:
       {
-        Serial.print(", Cell voltages: ");
-        Serial.print("[ ");
-        for(int i = 0; i < 16; i++){
-          Serial.print(bmsStats.cellVoltages[i]);
-          Serial.print("mV, ");
-        }
-        Serial.print("]");
         break;
       }
       case 0x96:
       {
-        Serial.print(", Monomer Temperatures: ");
-        Serial.print("[ ");
-        for(int i = 0; i < 16; i++){
-          Serial.print(bmsStats.monomerTemps[i]);
-          Serial.print(" deg C, ");
-        }
-        Serial.println("]");
         break;
       }
       case 0x97:
@@ -234,5 +166,40 @@ void printProcessedData(){
   Serial.print(bmsStats.minMonomerTempNum); 
 
   //printing 0x93 data:
+  Serial.print(", Charge/discharge status: ");
+  Serial.print(bmsStats.chargeDischargeStatus);
+  Serial.print(", Charging MOS tube state: ");
+  Serial.print(bmsStats.chargingMosTubeState);
+  Serial.print(", Discharge MOS tube state: ");
+  Serial.print(bmsStats.dischargeMosTubeState);
+  Serial.print(", BMS life cycles: ");
+  Serial.print(bmsStats.bmsLife);
+  Serial.print(", Residual Capacity: ");
+  Serial.print(bmsStats.residualCapacity);
+  Serial.print("mAH");
+
+  //printing 0x94 data:
+  Serial.print(", Battery string: ");
+  Serial.print(bmsStats.batteryString);
+
+  //printing 0x95 data:
+  Serial.print(", Cell voltages: ");
+  Serial.print("[ ");
+  for(int i = 0; i < 16; i++){
+    Serial.print(bmsStats.cellVoltages[i]);
+    Serial.print("mV, ");
+    }
+  Serial.print("]");
+
+  //printing 0x96 data:
+  Serial.print(", Monomer Temperatures: ");
+  Serial.print("[ ");
+  for(int i = 0; i < 16; i++){
+    Serial.print(bmsStats.monomerTemps[i]);
+    Serial.print(" deg C, ");
+    }
+  Serial.print("]");
+
+  //end 
   Serial.println();
 }
