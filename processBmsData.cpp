@@ -82,6 +82,10 @@ void processBmsData(uint8_t dataID){
       }
       case 0x95:
       {
+        for(int i = 0; i <= 94; i += 2 ){
+          bmsStats.cellVoltages[bmsStats.cellVoltagesIndex] = ( rxBuffers.multiPacketData[i] << 8 ) | rxBuffers.multiPacketData[i+1];
+          bmsStats.cellVoltagesIndex += 1;
+        }
         break;
       }
       case 0x96:
@@ -120,6 +124,10 @@ void processBmsData(uint8_t dataID){
 
 void resetRxBuffers(){
   rxBuffers.bufferIndex = 0;
+}
+
+void resetMultiPacketBuffer(){
+  rxBuffers.multiPacketBufferIndex = 0;
 }
 
 
@@ -180,13 +188,13 @@ void printProcessedData(){
   Serial.print(bmsStats.batteryString);
 
   //printing 0x95 data:
-  // Serial.print(", Cell voltages: ");
-  // Serial.print("[ ");
-  // for(int i = 0; i < 16; i++){
-  //   Serial.print(bmsStats.cellVoltages[i]);
-  //   Serial.print("mV, ");
-  //   }
-  // Serial.print("]");
+  Serial.print(", Cell voltages: ");
+  Serial.print("[ ");
+  for(int i = 0; i < 16; i++){
+    Serial.print(bmsStats.cellVoltages[i]);
+    Serial.print("mV, ");
+    }
+  Serial.print("]");
 
   //printing 0x96 data:
   // Serial.print(", Monomer Temperatures: ");

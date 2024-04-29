@@ -27,6 +27,8 @@ typedef enum{
 typedef struct RxBuffers{
   uint8_t packetData[8];
   uint8_t bufferIndex;
+  uint8_t multiPacketData[96];
+  uint8_t multiPacketBufferIndex;
 }RxBuffers;
 
 typedef struct bmsData{

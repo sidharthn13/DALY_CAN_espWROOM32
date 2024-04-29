@@ -9,7 +9,6 @@ long unsigned int requestTimer;
 STATE state;
 uint8_t processFlag;
 
-
 //initializing buffers to hold receiver data
 RxBuffers rxBuffers;
 
@@ -21,11 +20,11 @@ uint8_t buffer[8];
 
 void setup(){
 
-  //intializing state and fsm:
+  //intializing Finite State Machine:
   state = s0;
-  processFlag = 0; //processing of data frame should not happen now
+  processFlag = 0; //processing of data frame should not happen when flag value set to 0
 
-  //intializing request timer:
+  //intializing request timer to keep track of how long it has been since req for data was sent:
   requestTimer = 0;
 
   Serial.begin(115200);
@@ -48,18 +47,6 @@ void setup(){
   buffer[5] = 0x00;
   buffer[6] = 0x00;
   buffer[7] = 0x00;
-}
-
-void processCellVoltFrame( uint8_t cellNum ){
-  uint16_t cA = ( rxBuffers.packetData[1] << 8 ) | rxBuffers.packetData[2];
-  bmsStats.cellVoltages[cellNum] = cA;
-  bmsStats.cellVoltagesIndex += 1;
-  uint16_t cB = ( rxBuffers.packetData[3] << 8 ) | rxBuffers.packetData[4];
-  bmsStats.cellVoltages[cellNum+1] = cB;
-  bmsStats.cellVoltagesIndex += 1;
-  uint16_t cC = ( rxBuffers.packetData[5] << 8 ) | rxBuffers.packetData[6];
-  bmsStats.cellVoltages[cellNum+2] = cC;
-  bmsStats.cellVoltagesIndex += 1;
 }
 
 void processMonomerTempsFrame( uint8_t monomerNum ){
@@ -90,12 +77,13 @@ void onReceive(int packetSize) {
       }
     case 0x95:
       {  
-      resetRxBuffers();
       for(int i = 0; i < 8; i++){
-        rxBuffers.packetData[rxBuffers.bufferIndex] = CAN.read();
-        rxBuffers.bufferIndex += 1;
-        }
-      processCellVoltFrame(bmsStats.cellVoltagesIndex);
+        uint8_t data = CAN.read();
+        if( i != 0 && i != 7 ){
+          rxBuffers.multiPacketData[rxBuffers.multiPacketBufferIndex] = data;
+          rxBuffers.multiPacketBufferIndex += 1;
+        }     
+      }
       break;
       }
     case 0x96:
@@ -197,6 +185,23 @@ void loop(){
       if(processFlag == 1){
         processBmsData(0x94);
         processFlag = 0;
+        state = s5;
+        requestTimer = millis();
+      }
+      break;
+    }
+
+    case s5:
+    case s5_idle:
+    {
+      if(state == s5){
+        resetMultiPacketBuffer();
+        bmsStats.cellVoltagesIndex = 0;
+        requestData(0x95);
+        state = s5_idle;
+      }
+      if( millis() - requestTimer > 100 ){
+        processBmsData(0x95);
         state = s9;
         requestTimer = millis();
       }
