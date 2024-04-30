@@ -2,6 +2,9 @@
 #include "dalyBMS.h"
 #include "processBmsData.h"
 
+//timer to check if BMS is asleep:
+unsigned long int stallTimer;
+
 //initializing FSM 
 STATE state;
 uint8_t singlePacketDataAvailable;
@@ -18,6 +21,9 @@ bmsData bmsStats;
 uint8_t buffer[8];
 
 void setup(){
+
+  //initializing stall timer:
+  stallTimer = 0;
 
   //intializing Finite State Machine:
   state = s0;
@@ -111,6 +117,14 @@ void requestData(uint8_t dataID){
 
 void loop(){
 
+  if( !singlePacketDataAvailable ){
+    if( millis() - stallTimer > 1000 ){
+      Serial.println("BMS is asleep. Sending data request again...");
+      state = s0;
+      stallTimer = millis();
+    }
+  }
+
   switch(state){
     case s0:
     case s0_idle:
@@ -123,6 +137,7 @@ void loop(){
         processBmsData(0x90);
         state = s1;
         singlePacketDataAvailable = 0;
+        stallTimer = millis();
       }
       break;
     }
@@ -138,6 +153,7 @@ void loop(){
         processBmsData(0x91);
         state = s2;
         singlePacketDataAvailable = 0;
+        stallTimer = millis();
       }
       break;
     }
@@ -153,6 +169,7 @@ void loop(){
         processBmsData(0x92);
         state = s3;
         singlePacketDataAvailable = 0;
+        stallTimer = millis();
       }
       break;
     }
@@ -168,6 +185,7 @@ void loop(){
         processBmsData(0x93);
         state = s4;
         singlePacketDataAvailable = 0;
+        stallTimer = millis();
       }
       break;
     }
@@ -183,6 +201,7 @@ void loop(){
         processBmsData(0x94);
         state = s5;
         singlePacketDataAvailable = 0;
+        stallTimer = millis();
       }
       break;
     }
@@ -201,6 +220,7 @@ void loop(){
         processBmsData(0x95);
         state = s6;
         cellVoltPacketCount = 0;
+        stallTimer = millis();
       }
       break;
     }
@@ -219,6 +239,7 @@ void loop(){
         processBmsData(0x96);
         state = s7;
         monomerTempPacketCount = 0;
+        stallTimer = millis();
       }
       break;
     }
@@ -234,6 +255,7 @@ void loop(){
         processBmsData(0x97);
         state = s8;
         singlePacketDataAvailable = 0;
+        stallTimer = millis();
       }
       break;
     }
@@ -249,6 +271,7 @@ void loop(){
         processBmsData(0x98);
         state = s9;
         singlePacketDataAvailable = 0;
+        stallTimer = millis();
       }
       break;
     }
@@ -257,6 +280,7 @@ void loop(){
     {
       printProcessedData();
       state = s0;
+      stallTimer = millis();
       break;
     }
   }
