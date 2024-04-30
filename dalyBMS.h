@@ -61,6 +61,7 @@ typedef struct bmsData{
   //0x94 data:
   uint8_t batteryString;
   uint8_t temperatures;
+  uint16_t chargeDischargeCycles;
 
   //0x95 data:
   uint16_t cellVoltages[48];

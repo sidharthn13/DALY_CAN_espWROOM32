@@ -48,7 +48,7 @@ void processBmsData(uint8_t dataID){
         bmsStats.temperatures = rxBuffers.packetData[1];
         uint8_t chargerStatus = rxBuffers.packetData[2];
         uint8_t loadStatus = rxBuffers.packetData[3];
-        uint16_t chargeDischargeCycles = (rxBuffers.packetData[5] << 8) | rxBuffers.packetData[6];
+        bmsStats.chargeDischargeCycles = (rxBuffers.packetData[5] << 8) | rxBuffers.packetData[6];
         uint8_t DI_DO_states = rxBuffers.packetData[4];  //each bit in the first byte corresponds to a state
 
         break;
@@ -110,7 +110,7 @@ void resetMultiPacketBuffer(){
 
 void printProcessedData(){
   //printing 0x90 data:
-  Serial.print("Pressure: ");
+  Serial.print(" Pressure: ");
   Serial.print(bmsStats.pressureVoltage);
   Serial.print("V");
   Serial.print(", Acquisition: ");
@@ -165,6 +165,8 @@ void printProcessedData(){
   Serial.print(bmsStats.batteryString);
   Serial.print(", Temperatures: ");
   Serial.print(bmsStats.temperatures);
+  Serial.print(", Charge-Discharge Cycles: ");
+  Serial.print(bmsStats.chargeDischargeCycles);
 
   //printing 0x95 data:
   Serial.print(", Cell voltages: ");

@@ -2,12 +2,11 @@
 #include "dalyBMS.h"
 #include "processBmsData.h"
 
-//initializing requestTimer
-long unsigned int requestTimer;
-
 //initializing FSM 
 STATE state;
-uint8_t processFlag;
+uint8_t singlePacketDataAvailable;
+uint8_t cellVoltPacketCount;
+uint8_t monomerTempPacketCount;
 
 //initializing buffers to hold receiver data
 RxBuffers rxBuffers;
@@ -22,10 +21,9 @@ void setup(){
 
   //intializing Finite State Machine:
   state = s0;
-  processFlag = 0; //processing of data frame should not happen when flag value set to 0
-
-  //intializing request timer to keep track of how long it has been since req for data was sent:
-  requestTimer = 0;
+  singlePacketDataAvailable = 0;
+  cellVoltPacketCount = 0;
+  monomerTempPacketCount = 0;
 
   Serial.begin(115200);
   if(!CAN.begin(250E3)){
@@ -68,6 +66,7 @@ void onReceive(int packetSize) {
     case 0x97:
     case 0x98:
       {
+      singlePacketDataAvailable = 1;
       resetRxBuffers(); //sets buffer index to 0
       for(int i = 0; i < 8; i++){
       rxBuffers.packetData[rxBuffers.bufferIndex] = CAN.read();
@@ -77,6 +76,7 @@ void onReceive(int packetSize) {
       }
     case 0x95:
       {  
+      cellVoltPacketCount += 1;
       for(int i = 0; i < 8; i++){
         uint8_t data = CAN.read();
         if( i != 0 && i != 7 ){
@@ -88,6 +88,7 @@ void onReceive(int packetSize) {
       }
     case 0x96:
       {
+        monomerTempPacketCount += 1;
         for(int i = 0; i < 8; i++){
           uint8_t data = CAN.read();
           if(i!=0){
@@ -109,23 +110,19 @@ void requestData(uint8_t dataID){
 }
 
 void loop(){
-  
-  if ( millis() - requestTimer > 250 && state != s0 ){ processFlag = 1; }
 
   switch(state){
     case s0:
     case s0_idle:
     {
       if(state == s0){ 
-        requestTimer = millis();
         requestData(0x90); 
         state = s0_idle;
         }
-      if(processFlag == 1 && state == s0_idle){
+      if(singlePacketDataAvailable){
         processBmsData(0x90);
-        processFlag = 0;
         state = s1;
-        requestTimer = millis();
+        singlePacketDataAvailable = 0;
       }
       break;
     }
@@ -134,15 +131,13 @@ void loop(){
     case s1_idle:
     {
       if(state == s1){
-      requestTimer = millis();
       requestData(0x91);
       state = s1_idle;
       }
-      if(processFlag == 1 && state == s1_idle){
+      if(singlePacketDataAvailable){
         processBmsData(0x91);
-        processFlag = 0;
         state = s2;
-        requestTimer = millis();
+        singlePacketDataAvailable = 0;
       }
       break;
     }
@@ -151,15 +146,13 @@ void loop(){
     case s2_idle:
     {
       if(state == s2){
-        requestTimer = millis();
         requestData(0x92);
         state = s2_idle;
       }
-      if(processFlag == 1 && state == s2_idle){
+      if(singlePacketDataAvailable){
         processBmsData(0x92);
-        processFlag = 0;
         state = s3;
-        requestTimer = millis();
+        singlePacketDataAvailable = 0;
       }
       break;
     }
@@ -168,15 +161,13 @@ void loop(){
     case s3_idle:
     {
       if(state == s3){
-        requestTimer = millis();
         requestData(0x93);
         state = s3_idle;
       }
-      if(processFlag == 1 && state == s3_idle){
+      if(singlePacketDataAvailable){
         processBmsData(0x93);
-        processFlag = 0;
         state = s4;
-        requestTimer = millis();
+        singlePacketDataAvailable = 0;
       }
       break;
     }
@@ -185,15 +176,13 @@ void loop(){
     case s4_idle:
     {
       if(state == s4){
-        requestTimer = millis();
         requestData(0x94);
         state = s4_idle;
       }
-      if(processFlag == 1 && state == s4_idle){
+      if(singlePacketDataAvailable){
         processBmsData(0x94);
-        processFlag = 0;
         state = s5;
-        requestTimer = millis();
+        singlePacketDataAvailable = 0;
       }
       break;
     }
@@ -204,15 +193,14 @@ void loop(){
       if(state == s5){
         resetMultiPacketBuffer();
         bmsStats.cellVoltagesIndex = 0;
-        requestTimer = millis();
+        cellVoltPacketCount = 0;
         requestData(0x95);
         state = s5_idle;
       }
-      if( processFlag == 1 && state == s5_idle){
-        processFlag = 0;
+      if( cellVoltPacketCount > ceil(bmsStats.batteryString/3)){
         processBmsData(0x95);
         state = s6;
-        requestTimer = millis();
+        cellVoltPacketCount = 0;
       }
       break;
     }
@@ -223,15 +211,14 @@ void loop(){
       if(state == s6){
         resetMultiPacketBuffer();
         bmsStats.monomerTempsIndex = 0;
-        requestTimer = millis();
+        monomerTempPacketCount = 0;
         requestData(0x96);
         state = s6_idle;
       }
-      if( processFlag == 1 && state == s6_idle){
-        processFlag = 0;
+      if( monomerTempPacketCount > ceil(bmsStats.temperatures/7) ){
         processBmsData(0x96);
         state = s7;
-        requestTimer = millis();
+        monomerTempPacketCount = 0;
       }
       break;
     }
@@ -240,15 +227,13 @@ void loop(){
     case s7_idle:
     {
       if(state == s7){
-        requestTimer = millis();
         requestData(0x97);
         state = s7_idle;
       }
-      if(processFlag == 1 && state == s7_idle){
+      if(singlePacketDataAvailable){
         processBmsData(0x97);
-        processFlag = 0;
         state = s8;
-        requestTimer = millis();
+        singlePacketDataAvailable = 0;
       }
       break;
     }
@@ -257,15 +242,13 @@ void loop(){
     case s8_idle:
     {
       if(state == s8){
-        requestTimer = millis();
         requestData(0x98);
         state = s8_idle;
       }
-      if(processFlag == 1 && state == s8_idle){
+      if(singlePacketDataAvailable){
         processBmsData(0x98);
-        processFlag = 0;
         state = s9;
-        requestTimer = millis();
+        singlePacketDataAvailable = 0;
       }
       break;
     }
@@ -274,7 +257,6 @@ void loop(){
     {
       printProcessedData();
       state = s0;
-      requestTimer = millis();
       break;
     }
   }
