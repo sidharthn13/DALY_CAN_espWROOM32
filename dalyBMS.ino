@@ -110,13 +110,14 @@ void requestData(uint8_t dataID){
 
 void loop(){
   
-  if ( millis() - requestTimer > 200 ){ processFlag = 1; }
+  if ( millis() - requestTimer > 250 && state != s0 ){ processFlag = 1; }
 
   switch(state){
     case s0:
     case s0_idle:
     {
       if(state == s0){ 
+        requestTimer = millis();
         requestData(0x90); 
         state = s0_idle;
         }
@@ -133,6 +134,7 @@ void loop(){
     case s1_idle:
     {
       if(state == s1){
+      requestTimer = millis();
       requestData(0x91);
       state = s1_idle;
       }
@@ -149,6 +151,7 @@ void loop(){
     case s2_idle:
     {
       if(state == s2){
+        requestTimer = millis();
         requestData(0x92);
         state = s2_idle;
       }
@@ -165,6 +168,7 @@ void loop(){
     case s3_idle:
     {
       if(state == s3){
+        requestTimer = millis();
         requestData(0x93);
         state = s3_idle;
       }
@@ -181,6 +185,7 @@ void loop(){
     case s4_idle:
     {
       if(state == s4){
+        requestTimer = millis();
         requestData(0x94);
         state = s4_idle;
       }
@@ -199,6 +204,7 @@ void loop(){
       if(state == s5){
         resetMultiPacketBuffer();
         bmsStats.cellVoltagesIndex = 0;
+        requestTimer = millis();
         requestData(0x95);
         state = s5_idle;
       }
@@ -217,6 +223,7 @@ void loop(){
       if(state == s6){
         resetMultiPacketBuffer();
         bmsStats.monomerTempsIndex = 0;
+        requestTimer = millis();
         requestData(0x96);
         state = s6_idle;
       }
@@ -233,6 +240,7 @@ void loop(){
     case s7_idle:
     {
       if(state == s7){
+        requestTimer = millis();
         requestData(0x97);
         state = s7_idle;
       }
@@ -249,6 +257,7 @@ void loop(){
     case s8_idle:
     {
       if(state == s8){
+        requestTimer = millis();
         requestData(0x98);
         state = s8_idle;
       }

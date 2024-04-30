@@ -45,11 +45,11 @@ void processBmsData(uint8_t dataID){
       case 0x94:
       {
         bmsStats.batteryString = rxBuffers.packetData[0];
-        uint16_t temperature = rxBuffers.packetData[1];
-        uint16_t chargerStatus = rxBuffers.packetData[2];
-        uint16_t loadStatus = rxBuffers.packetData[3];
+        bmsStats.temperatures = rxBuffers.packetData[1];
+        uint8_t chargerStatus = rxBuffers.packetData[2];
+        uint8_t loadStatus = rxBuffers.packetData[3];
         uint16_t chargeDischargeCycles = (rxBuffers.packetData[5] << 8) | rxBuffers.packetData[6];
-        uint16_t DI_DO_states = rxBuffers.packetData[4];  //each bit in the first byte corresponds to a state
+        uint8_t DI_DO_states = rxBuffers.packetData[4];  //each bit in the first byte corresponds to a state
 
         break;
       }
@@ -163,11 +163,13 @@ void printProcessedData(){
   //printing 0x94 data:
   Serial.print(", Battery string: ");
   Serial.print(bmsStats.batteryString);
+  Serial.print(", Temperatures: ");
+  Serial.print(bmsStats.temperatures);
 
   //printing 0x95 data:
   Serial.print(", Cell voltages: ");
   Serial.print("[ ");
-  for(int i = 0; i < 16; i++){
+  for(int i = 0; i < bmsStats.batteryString; i++){
     Serial.print(bmsStats.cellVoltages[i]);
     Serial.print("mV, ");
     }
@@ -176,7 +178,7 @@ void printProcessedData(){
   // printing 0x96 data:
   Serial.print(", Monomer Temperatures: ");
   Serial.print("[ ");
-  for(int i = 0; i < 16; i++){
+  for(int i = 0; i < bmsStats.temperatures; i++){
     Serial.print(bmsStats.monomerTemps[i]);
     Serial.print(" deg C, ");
     }
